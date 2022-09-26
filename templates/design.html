@@ -1,0 +1,100 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Design an experience</title>
+
+  <link rel="stylesheet" href="{{url_for("static", filename="css/bootstrap.css")}}">
+</head>
+
+<body>
+    <div class="container">
+        <form class="form border-1 rounded-2 m-1 p-1 border-dark">
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Name of the experiment" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mode</label>
+                <label><input type="radio" name="mode" value="readability" /> Lisibilité (pas d'image)</label>
+                <label><input type="radio" name="mode" value="correctability" /> Correction (images nécessaires)</label>
+            </div>
+            <div class="mb-3">
+                <div class="form-label">Configure sample size and diversity</div>
+                <div class="row">
+                    <label class="form-label col-3">Number of different sample</label>
+                    <div class="col-2">
+                        <input type="number" class="form-control"  placeholder="5" id="samples"/>
+                    </div>
+                    <label class="form-label col-3">Number of version per sample</label>
+                    <div class="col-2">
+                        <input type="number" class="form-control"  placeholder="4" id="versions" />
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-primary" id="generate">Update form</button>
+                    </div>
+                </div>
+            </div>
+            <div id="recipient">
+
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript">
+        (function (){
+            function createHTML(string) {
+                //return new DOMParser().parseFromString(string, "text/html").body.firstElementChild;
+                // return document.createRange().createContextualFragment(string);
+                let template = document.createElement("template");
+                template.innerHTML = string.trim();
+                return template.content.firstElementChild;
+            }
+            const recipient = document.querySelector("#recipient"),
+                  generate = document.querySelector("#generate");
+            generate.addEventListener("click", function(e) {
+                e.preventDefault();
+                let samples = parseInt(document.querySelector("#samples").value),
+                    versions = parseInt(document.querySelector("#versions").value),
+                    i;
+                for (i = 0; i < samples; i++) {
+                    let sample = document.querySelector(`#samples-${i}`);
+                    if (sample === null) {
+                        sample = createHTML(`<div class="row" id="samples-${i}"><h2>Échantillon ${i+1}</h2><div class="lines"></div></div>`)
+                        recipient.appendChild(sample);
+                    }
+                    let sample_container = sample.querySelector(".lines");
+                    let j;
+                    for (j = 0; j < versions; j++) {
+                        if (sample_container.querySelector(`.version-${j}`) === null) {
+                            sample_container.appendChild(
+                                createHTML(
+                                    `<div class='input-group version-${j}'>
+                                        <input type='text' placeholder="Value" class="form-control">
+                                        <input type='float' min="0.0" max="100.0" placeholder="CER" class="form-control">
+                                    </div>`)
+                            );
+                        }
+                    }
+                    if (sample_container.querySelector(`.version-${j}`)) {
+                        // Last j is not lower than N
+                        let nbVersions = sample_container.querySelectorAll("div").length;
+                        for (let j = versions; j < nbVersions; j++) {
+                            sample_container.querySelector(`.version-${j}`).remove();
+                        }
+                    }
+                }
+                if (recipient.querySelector(`#samples-${i}`)) {
+                    // Last j is not lower than N
+                    let nbSamples = recipient.children.length;
+                    for (i = samples; i < nbSamples; i++) {
+                        recipient.querySelector(`#samples-${i}`).remove();
+                    }
+                }
+            })
+        })(document);
+    </script>
+</body>
+</html>
