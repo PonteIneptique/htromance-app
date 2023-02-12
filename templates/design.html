@@ -52,8 +52,14 @@
                 template.innerHTML = string.trim();
                 return template.content.firstElementChild;
             }
+
+            function useImages() {
+                return document.querySelector("#mode"); // Check selected
+            }
+
             const recipient = document.querySelector("#recipient"),
                   generate = document.querySelector("#generate");
+
             generate.addEventListener("click", function(e) {
                 e.preventDefault();
                 let samples = parseInt(document.querySelector("#samples").value),
@@ -72,8 +78,8 @@
                             sample_container.appendChild(
                                 createHTML(
                                     `<div class='input-group version-${j}'>
-                                        <input type='text' placeholder="Value" class="form-control">
-                                        <input type='float' min="0.0" max="100.0" placeholder="CER" class="form-control">
+                                        <input type='text' placeholder="Value" class="form-control" name="sample-${i}-version-${j}" required/>
+                                        <input type='float' min="0.0" max="100.0" placeholder="CER" class="form-control" name="sample-${i}-cer-${j}" required>
                                     </div>`)
                             );
                         }
